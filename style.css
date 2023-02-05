@@ -4,7 +4,7 @@ body {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content:space-evenly;
+    justify-content: space-evenly;
     align-items: center;
     height: 100vh;
     width: 100vw;
@@ -20,7 +20,7 @@ body {
     border-radius: 10px;
     padding: 30px;
     display: flex;
-    flex-direction:column;
+    flex-direction: column;
     justify-content: space-between;
     align-items: center;
 }
@@ -89,17 +89,45 @@ footer {
     font-weight: 900;
     font-weight: 100;
     color: #fff;
-  }
+}
 
 svg {
     height: 20px;
     width: 20px;
     transition: transform 0.3s ease-in-out;
-    box-shadow:none;
+    box-shadow: none;
     margin-right: 10px;
     fill: #fff;
-  }
+}
 
- svg:hover {
+svg:hover {
     transform: rotate(360deg);
-  }
+}
+
+.num-pad div:hover {
+    background-color: rgba(255, 255, 255, 0.178);
+    cursor: pointer;
+}
+
+.buttons-c-d div:hover {
+    background-color: rgba(255, 255, 255, 0.178);
+    cursor: pointer;
+}
+.display {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.display div {
+    padding: 10px;
+}
+
+.display-upper {
+    font-size: 18px;
+}
+
+.display-lower {
+    font-size: 30px;
+}
