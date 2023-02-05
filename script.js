@@ -23,5 +23,17 @@ function getFirstNum() {
     return firstNum
 }
 
+function clear() {
+    const buttonClear = document.querySelector('.button-clear');
+    buttonClear.addEventListener('click', function() {
+        console.log('CLEAR');
+        firstNum = '';
+        secondNum = '';
+        operator = '';
+        displayLower.textContent = '';
+        displayUpper.textContent = '';
+    })
+}
 
 getFirstNum()
+clear()
