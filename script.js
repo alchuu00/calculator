@@ -1,6 +1,7 @@
 let firstNum = ''
 let secondNum = ''
 let operator = ''
+let opSymbol = ''
 
 const digits = document.querySelectorAll('#digit');
 const displayLower = document.querySelector('.display-lower')
@@ -21,8 +22,6 @@ function getFirstNum() {
 }
 
 function getSecondNum() {
-    // Stop listening for firstNum
-    removeListenerFirstNum()
     // listen for digits of secondNum and assign them to a variable
     let digit = this.textContent;
     if (secondNum === '' && digit === '') {
@@ -31,14 +30,14 @@ function getSecondNum() {
     secondNum += digit;
     displayLower.textContent = secondNum;
     console.log('second num ' + secondNum)
+
 }
 
 function getOperator() {
-// when user clicks operator stop listening for firstNum
+    // when user clicks operator stop listening for firstNum
     removeListenerFirstNum()
 
-    let opSymbol
-    let operator = this.getAttribute('id')
+    operator = this.getAttribute('id')
 
     console.log('operator ' + operator)
 
@@ -61,25 +60,25 @@ function getOperator() {
     digits.forEach(function (dig) {
         dig.addEventListener("click", getSecondNum)
     })
-    // when user clicks equal display result
-    equal.addEventListener('click', function () {
-        if (!firstNum || !secondNum || !operator) {
-            return;
-        }
-        if (operator === 'sum') {
-            displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`; 
-            displayLower.textContent = parseFloat(firstNum) + parseFloat(secondNum);
-        } else if (operator === 'subtract') {
-            displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`;
-            displayLower.textContent = parseFloat(firstNum) - parseFloat(secondNum);
-        } else if (operator === 'divide') {
-            displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`;
-            displayLower.textContent = parseFloat(firstNum) / parseFloat(secondNum);
-        } else if (operator === 'multiply') {
-            displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`;
-            displayLower.textContent = parseFloat(firstNum) * parseFloat(secondNum);
-        }
-    })
+}
+
+function isEqual() {
+    if (!firstNum || !secondNum || !operator) {
+        return;
+    }
+    if (operator === 'sum') {
+        displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`;
+        displayLower.textContent = parseFloat(firstNum) + parseFloat(secondNum);
+    } else if (operator === 'subtract') {
+        displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`;
+        displayLower.textContent = parseFloat(firstNum) - parseFloat(secondNum);
+    } else if (operator === 'divide') {
+        displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`;
+        displayLower.textContent = parseFloat(firstNum) / parseFloat(secondNum);
+    } else if (operator === 'multiply') {
+        displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`;
+        displayLower.textContent = parseFloat(firstNum) * parseFloat(secondNum);
+    }
 }
 
 // button to reset all variables to null
@@ -92,6 +91,9 @@ function clear() {
         operator = '';
         displayLower.textContent = '';
         displayUpper.textContent = '';
+        console.log('first num ' + firstNum)
+        console.log('second num ' + secondNum)
+        console.log('operator ' + operator)
     })
 }
 
@@ -107,15 +109,19 @@ function removeListenerSecondNum() {
     })
 }
 
+function start() {
+    digits.forEach(function (dig) {
+        dig.addEventListener("click", getFirstNum)
+        dig.removeEventListener('click', getSecondNum)
+    })
+    operators.forEach(function (op) {
+        op.addEventListener('click', getOperator)
+    })
 
-// START
+    // when user clicks equal display result
+    equal.addEventListener('click', isEqual)
 
-digits.forEach(function (dig) {
-    dig.addEventListener("click", getFirstNum)
-    dig.removeEventListener('click', getSecondNum)
-})
-operators.forEach(function (op) {
-    op.addEventListener('click', getOperator)
-})
+    clear()
+}
 
-clear()
+start()
