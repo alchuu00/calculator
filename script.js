@@ -1,127 +1,158 @@
-let firstNum = ''
-let secondNum = ''
+let currentNum = ''
+let previousNum = ''
 let operator = ''
-let opSymbol = ''
 
-const digits = document.querySelectorAll('#digit');
-const displayLower = document.querySelector('.display-lower')
-const displayUpper = document.querySelector('.display-upper')
-const operators = document.querySelectorAll('.operator')
+const currentDisplayNumber = document.querySelector('.display-lower')
+const previousDisplayNumber = document.querySelector('.display-upper')
+
+window.addEventListener('keydown', handleKeyPress)
+
 const equal = document.getElementById('equal')
+equal.addEventListener('click', () => {
+    if (currentNum != '' && previousNum != '') {
+        calculate()
+    }
+})
+
 const float = document.querySelector('.float')
 
-// listen for digits of firstNum and assign them to a variable
-function getFirstNum() {
-    let digit = this.textContent;
-    if (firstNum === '' && digit === '') {
-        return;
-    }
-    firstNum += digit;
-    displayLower.textContent = firstNum;
-    console.log('first num ' + firstNum)
-}
+const clear = document.querySelector('.button-clear')
+clear.addEventListener('click', clearCalculator)
 
-function getSecondNum() {
-    // listen for digits of secondNum and assign them to a variable
-    let digit = this.textContent;
-    if (secondNum === '' && digit === '') {
-        return;
-    }
-    secondNum += digit;
-    displayLower.textContent = secondNum;
-    console.log('second num ' + secondNum)
+const del = document.querySelector('.button-delete')
+del.addEventListener('click', handleDelete)
 
-}
+const numberButtons = document.querySelectorAll('#digit')
 
-function getOperator() {
-    // when user clicks operator stop listening for firstNum
-    removeListenerFirstNum()
+const operators = document.querySelectorAll('.operator')
 
-    operator = this.getAttribute('id')
-
-    console.log('operator ' + operator)
-
-    if (!firstNum) {
-        firstNum = 0;
-    }
-    if (operator === 'sum') {
-        opSymbol = '+'
-    } else if (operator === 'subtract') {
-        opSymbol = '-'
-    } else if (operator === 'divide') {
-        opSymbol = '÷'
-    } else if (operator === 'multiply') {
-        opSymbol = '×'
-    }
-    // display firstNum and operator in upperDisplay 
-    displayUpper.textContent = `${firstNum} ${opSymbol} `;
-    displayLower.textContent = ''
-
-    digits.forEach(function (dig) {
-        dig.addEventListener("click", getSecondNum)
+numberButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        handleNumber(e.target.textContent)
     })
-}
+})
 
-function isEqual() {
-    if (!firstNum || !secondNum || !operator) {
-        return;
+function handleNumber(number) {
+    if (previousNum !== '' && currentNum !== '' && operator === '') {
+        previousNum = ''
+        currentDisplayNumber.textContent = currentNum
     }
-    if (operator === 'sum') {
-        displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`;
-        displayLower.textContent = parseFloat(firstNum) + parseFloat(secondNum);
-    } else if (operator === 'subtract') {
-        displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`;
-        displayLower.textContent = parseFloat(firstNum) - parseFloat(secondNum);
-    } else if (operator === 'divide') {
-        displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`;
-        displayLower.textContent = parseFloat(firstNum) / parseFloat(secondNum);
-    } else if (operator === 'multiply') {
-        displayUpper.textContent = `${firstNum} ${opSymbol} ${secondNum} =`;
-        displayLower.textContent = parseFloat(firstNum) * parseFloat(secondNum);
+    if (currentNum.length <= 12) {
+        currentNum += number
+        currentDisplayNumber.textContent = currentNum;
     }
 }
 
-// button to reset all variables to null
-function clear() {
-    const buttonClear = document.querySelector('.button-clear');
-    buttonClear.addEventListener('click', function () {
-        console.log('CLEAR');
-        firstNum = '';
-        secondNum = '';
-        operator = '';
-        displayLower.textContent = '';
-        displayUpper.textContent = '';
-        console.log('first num ' + firstNum)
-        console.log('second num ' + secondNum)
-        console.log('operator ' + operator)
+operators.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        handleOperator(e.target.textContent)
     })
+})
+
+function handleOperator(op) {
+    if (previousNum === '') {
+        previousNum = currentNum
+        operatorCheck(op)
+    } else if (currentNum === '') {
+        operatorCheck(op)
+    } else {
+        calculate()
+        operator = op
+        currentDisplayNumber.textContent = ''
+        previousDisplayNumber.textContent = previousNum + ' ' + operator
+    }
 }
 
-function removeListenerFirstNum() {
-    digits.forEach(function (dig) {
-        dig.removeEventListener("click", getFirstNum)
-    })
+function operatorCheck(text) {
+    operator = text
+    previousDisplayNumber.textContent = previousNum + ' ' + operator
+    currentDisplayNumber.textContent = ''
+    currentNum = ''
 }
 
-function removeListenerSecondNum() {
-    digits.forEach(function (dig) {
-        dig.removeEventListener("click", getSecondNum)
-    })
+function calculate() {
+    previousNum = Number(previousNum)
+    currentNum = Number(currentNum)
+
+    if (operator === '+') {
+        previousNum += currentNum
+    } else if (operator === '-') {
+        previousNum -= currentNum
+    } else if (operator === '×') {
+        previousNum *= currentNum
+    } else if (operator === '÷') {
+        if (currentNum === 0) {
+            previousNum = 'error'
+            displayResults()
+            return
+
+        }
+        previousNum /= currentNum
+    }
+    previousNum = roundNum(previousNum)
+    previousNum = previousNum.toString()
+    displayResults()
 }
 
-function start() {
-    digits.forEach(function (dig) {
-        dig.addEventListener("click", getFirstNum)
-        dig.removeEventListener('click', getSecondNum)
-    })
-    operators.forEach(function (op) {
-        op.addEventListener('click', getOperator)
-    })
-
-    // when user clicks equal display result
-    equal.addEventListener('click', isEqual)
-
-    clear()
+function roundNum(num) {
+    return Math.round(num * 100000) / 100000
 }
 
-start()
+function displayResults() {
+    if (previousNum.length <= 12) {
+        currentDisplayNumber.textContent = previousNum
+    } else {
+        currentDisplayNumber.textContent = previousNum.slice(0, 12) + '...'
+    }
+    previousDisplayNumber.textContent = ''
+    operator = ''
+    currentNum = ''
+}
+
+function clearCalculator() {
+    currentNum = ''
+    previousNum = ''
+    operator = ''
+    currentDisplayNumber.textContent = ''
+    previousDisplayNumber.textContent = ''
+}
+
+function addDecimal() {
+    if (!currentNum.includes('.')) {
+        currentNum += '.'
+        currentDisplayNumber.textContent = currentNum
+    }
+}
+
+function handleKeyPress(e) {
+    e.preventDefault()
+    if (e.key >= 0 && e.key <= 9) {
+        handleNumber(e.key)
+    }
+    if (e.key === 'Enter' || 
+    e.key === '=' && currentNum != '' && previousNum != '') {
+        calculate()
+    }
+    if (e.key === '+' || e.key === '-') {
+        handleOperator()
+    }
+    if (e.key === '*') {
+        handleOperator('×')
+    }
+    if (e.key === '/') {
+        handleOperator('÷')
+    }
+    if (e.key === '.') {
+        addDecimal()
+    }
+    if (e.key === 'Backspace') {
+        handleDelete()
+    }
+}
+
+function handleDelete() {
+    if (currentNum != '') {
+        currentNum = currentNum.slice(0, -1)
+        currentDisplayNumber.textContent = currentNum
+    }
+}
